@@ -8,18 +8,16 @@ type Labels = Record<string, string | undefined>;
 /**
  * Scope-wide k8s metadata.
  *
- * @example For example, if you wish all API objects within a construct subtree
+ * Metadata is applied top-down. This means that API-object-level metadata will
+ * override any metadata specified by it's parent, etc.
+ *
+  * @example For example, if you wish all API objects within a construct subtree
  * to have a set of labels:
  *
- * ```ts
  * Metadata.of(scope).addLabels({
  *   app: 'my-app',
  *   foo: 'bar'
  * });
- * ```
- *
- * Metadata is applied top-down. This means that API-object-level metadata will
- * override any metadata specified by it's parent, etc.
  */
 export class Metadata extends Construct {
   /**
@@ -90,13 +88,15 @@ export class Metadata extends Construct {
    * If the value is set to `undefined` the label is removed from the scope &
    * all API objects (equivalent to `removeLabel`).
    *
-   * @param labels The labels to apply
+   * @param name The name of the label
+   * @param value The value of the label, or `undefined` to remove the label
+   * from the scope.
    */
-  public addLabels(labels: { [name: string]: string | undefined }) {
+  public addLabel(name: string, value: string | undefined) {
     // merge with existing
     this.labels = sortByKey({
       ...this.labels,
-      ...labels
+      [name]: value
     });
   }
 
@@ -106,7 +106,7 @@ export class Metadata extends Construct {
    * @param label The label to remove
    */
   public removeLabel(label: string) {
-    this.addLabels({ [label]: undefined });
+    this.addLabel(label, undefined);
   }
 
   /**

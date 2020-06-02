@@ -116,7 +116,7 @@ new MyChart(app, 'my-chart');
 new YourChart(app, 'your-chart');
 // ...
 
-Metadata.of(app).addLabels({ app: 'my-app' });
+Metadata.of(app).addLabel('app', 'my-app');
 
 app.synth();
 ```

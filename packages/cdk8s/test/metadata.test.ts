@@ -196,10 +196,8 @@ describe('labels', () => {
     const metadata = Metadata.of(construct);
 
     // WHEN
-    metadata.addLabels({
-      label1: 'value1',
-      label2: 'value2'
-    });
+    metadata.addLabel('label1', 'value1');
+    metadata.addLabel('label2', 'value2');
 
     // THEN
     expect(Metadata.resolveLabels(construct)).toStrictEqual({
@@ -212,15 +210,11 @@ describe('labels', () => {
     // GIVEN
     const construct = new Construct(undefined as any, 'root');
     const metadata = Metadata.of(construct);
-    metadata.addLabels({
-      label1: 'value1',
-      label2: 'value2'
-    });
+    metadata.addLabel('label1', 'value1');
+    metadata.addLabel('label2', 'value2');
 
     // WHEN
-    metadata.addLabels({
-      label3: 'value3',
-    });
+    metadata.addLabel('label3', 'value3');
 
     // THEN
     expect(Metadata.resolveLabels(construct)).toStrictEqual({
@@ -234,15 +228,11 @@ describe('labels', () => {
     // GIVEN
     const construct = new Construct(undefined as any, 'root');
     const metadata = Metadata.of(construct);
-    metadata.addLabels({
-      aaaa: 'value1',
-      zzzz: 'value2'
-    });
+    metadata.addLabel('aaaa', 'value1');
+    metadata.addLabel('zzzz', 'value2');
 
     // WHEN
-    metadata.addLabels({
-      bbbb: 'value3',
-    });
+    metadata.addLabel('bbbb', 'value3');
 
     // THEN
     expect(Metadata.resolveLabels(construct)).toStrictEqual({
@@ -258,9 +248,7 @@ describe('labels', () => {
     const tree = createTree();
 
     // WHEN
-    Metadata.of(tree.root).addLabels({
-      root: 'i-am-root'
-    });
+    Metadata.of(tree.root).addLabel('root', 'i-am-root');
 
     // THEN: "root" labels are applied to all nodes
     tree.all.forEach(c => expect(Metadata.resolveLabels(c)).toStrictEqual({
@@ -268,14 +256,9 @@ describe('labels', () => {
     }));
 
     // WHEN
-    Metadata.of(tree.childgroup).addLabels({
-      root: 'childgroup',
-      childgroup: 'yes'
-    });
-
-    Metadata.of(tree.child3).addLabels({
-      foo: 'bar'
-    });
+    Metadata.of(tree.childgroup).addLabel('root', 'childgroup');
+    Metadata.of(tree.childgroup).addLabel('childgroup', 'yes');
+    Metadata.of(tree.child3).addLabel('foo', 'bar');
 
     // THEN: "childgroup" overrides root labels
     expect(Metadata.resolveLabels(tree.root)).toStrictEqual({ root: 'i-am-root' });
@@ -292,13 +275,13 @@ describe('labels', () => {
     const root = new Root();
     const parent = new Construct(root, 'parent');
     const child = new Construct(parent, 'child');
-    Metadata.of(root).addLabels({ 'my_label': 'root' });
+    Metadata.of(root).addLabel('my_label', 'root');
     expect(Metadata.resolveLabels(root)).toStrictEqual({ 'my_label': 'root' });
     expect(Metadata.resolveLabels(parent)).toStrictEqual({ 'my_label': 'root' });
     expect(Metadata.resolveLabels(child)).toStrictEqual({ 'my_label': 'root' });
 
     // WHEN
-    Metadata.of(parent).addLabels({ 'my_label': undefined });
+    Metadata.of(parent).addLabel('my_label', undefined);
 
     // THEN
     expect(Metadata.resolveLabels(root)).toStrictEqual({ 'my_label': 'root' });
@@ -311,8 +294,9 @@ describe('labels', () => {
     const root = new Root();
     const parent = new Construct(root, 'parent');
     const child = new Construct(parent, 'child');
-    Metadata.of(root).addLabels({ foo: '123' });
-    Metadata.of(parent).addLabels({ foo: '123', bar: '8989' });
+    Metadata.of(root).addLabel('foo', '123');
+    Metadata.of(parent).addLabel('foo', '123');
+    Metadata.of(parent).addLabel('bar', '8989');
     expect(Metadata.resolveLabels(root)).toStrictEqual({ foo: '123' });
     expect(Metadata.resolveLabels(parent)).toStrictEqual({ foo: '123', bar: '8989' });
     expect(Metadata.resolveLabels(child)).toStrictEqual({ foo: '123', bar: '8989' });

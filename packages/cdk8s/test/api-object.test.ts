@@ -197,8 +197,8 @@ test('respects scope-level metadata', () => {
   });
 
   // WHEN
-  Metadata.of(chart).addLabels({ chart: 'chart-wide label' });
-  Metadata.of(group).addLabels({ group: 'group-wide label' });
+  Metadata.of(chart).addLabel('chart', 'chart-wide label');
+  Metadata.of(group).addLabel('group', 'group-wide label');
   Metadata.of(group).addNamespace('group-namespace');
 
   // THEN
