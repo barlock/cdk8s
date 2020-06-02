@@ -76,6 +76,71 @@ NOTE: names of included objects (`metadata.name`) are preserved. This means that
 if you try to include the same manifest twice into the same chart, your manifest
 will have duplicate definitions of the same objects.
 
+## Metadata
+
+Kubernetes objects can have metadata such as [labels], [annotations] and
+[namespaces] associated with them.
+
+[labels]: (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+[annotations]: (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+[namespaces]: (https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+
+When an API object is defined, you can explicitly specify it's metadata. For example:
+
+```ts
+new Pod(this, 'mypod', {
+  metadata: {
+    namespace: 'my-app',
+    labels: {
+      foo: 'bar'
+    }
+  },
+});
+```
+
+cdk8s also supports applying specific metadata at the *construct scope* using
+the `Metadata` class. By applying metadata at the scope level, all API objects
+defined within this sub-tree will have that metadata defined.
+
+Use the `Metadata.of(scope)` to obtain a `Metadata` object associated with a
+certain construct scope, and use the `addXxx` and `removeXxx` methods to
+add/remove metadata from that scope.
+
+For example, the following code adds the `app=my-app` label to all API objects
+in all charts in an app:
+
+```ts
+const app = new App();
+
+new MyChart(app, 'my-chart');
+new YourChart(app, 'your-chart');
+// ...
+
+Metadata.of(app).addLabels({ app: 'my-app' });
+
+app.synth();
+```
+
+The following example sets the namespace of all API objects in a custom construct:
+
+```ts
+class MyCustomConstruct extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+
+    Metadata.of(this).addNamespace('redis-app');
+
+    new Pod(...);
+    new Deployment(...);
+
+    new ChildConstruct(...); // applies recursively
+  }
+}
+```
+
+You can also remove a label or a namespace definition from a scope (and all API
+objects within that scope) using the `removeXxx` methods.
+
 ### Testing
 
 cdk8s bundles a set of test utilities under the `Testing` class:

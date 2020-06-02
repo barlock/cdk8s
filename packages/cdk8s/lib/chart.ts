@@ -3,6 +3,7 @@ import * as path from 'path';
 import { ApiObject } from './api-object';
 import { Names } from './names';
 import { Yaml } from './yaml';
+import { Metadata } from './metadata';
 
 export interface ChartOptions {
   /**
@@ -49,6 +50,11 @@ export class Chart extends Construct {
     super(scope, ns);
     this.manifestFile = `${Node.of(this).uniqueId}.k8s.yaml`;
     this.namespace = options.namespace;
+
+    // apply the namespace through Metadata object
+    if (options.namespace) {
+      Metadata.of(this).addNamespace(options.namespace);
+    }
   }
 
   /**

@@ -3,6 +3,7 @@ import { Chart } from './chart';
 import { removeEmpty } from './_util';
 import { resolve } from './_tokens';
 import * as stringify from 'json-stable-stringify';
+import { Metadata } from './metadata';
 
 /**
  * Metadata associated with this object.
@@ -111,13 +112,29 @@ export class ApiObject extends Construct {
 
   /**
    * Renders the object to Kubernetes JSON.
+   *
+   * This method is intended to be called by the framework during synthesis only
+   * after the entire tree has been initialized. Calling this directly may
+   * produce the wrong result due to the fact the objects can be mutated.
    */
   public toJson(): any {
+    const namespace = this.options.metadata?.namespace ?? Metadata.resolveNamespace(this);
+
+    let labels = {
+      ...this.options.metadata?.labels,
+      ...Metadata.resolveLabels(this)
+    };
+
+    if (Object.keys(labels).length === 0) {
+      labels = undefined;
+    }
+
     const data = {
       ...this.options,
       metadata: {
-        namespace: Chart.of(this).namespace,
         ...this.options.metadata,
+        namespace,
+        labels,
         name: this.name,
       }
     };
